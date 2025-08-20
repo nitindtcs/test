@@ -1,0 +1,301 @@
+TABLES: mara, marc, eina, mvke, eine.
+
+TYPES: BEGIN OF gty_marc,
+         matnr TYPE marc-matnr,
+         werks TYPE marc-werks,
+         kzkri TYPE marc-kzkri,
+         xchpf TYPE marc-xchpf,
+         kordb TYPE marc-kordb,
+         ersda TYPE	mara-ersda,                "++2037782 on 14-Oct-24 for IP-112275
+**Start of Change by 2037782 on 20-Mar-24 for IP-92524
+         mtart TYPE mara-mtart,
+         brgew TYPE	mara-brgew,
+         ntgew TYPE mara-ntgew,
+         gewei TYPE mara-gewei,
+**End of Change by 2037782 on 20-Mar-24 for IP-92524
+       END OF gty_marc,
+
+       BEGIN OF gty_eord,
+         matnr TYPE eord-matnr,
+         werks TYPE eord-werks,
+         zeord TYPE eord-zeord,
+       END OF gty_eord.
+
+DATA: gt_source   TYPE TABLE OF /tcsign/mdsc_mm_source,
+      gs_source   TYPE /tcsign/mdsc_mm_source,
+      gt_marc     TYPE TABLE OF gty_marc,
+      gt_marc2    TYPE TABLE OF gty_marc,
+      gs_marc     TYPE gty_marc,
+      gt_eord     TYPE TABLE OF gty_eord,
+      gs_eord     TYPE gty_eord,
+      gt_makt     TYPE TABLE OF makt,
+      gs_makt     TYPE makt,
+      gt_price    TYPE STANDARD TABLE OF /tcsign/mdsc_mm_price,
+      gs_price    TYPE /tcsign/mdsc_mm_price,
+      gt_batch    TYPE STANDARD TABLE OF /tcsign/mdsc_mm_batch,
+      gs_batch    TYPE /tcsign/mdsc_mm_batch,
+      gt_storage  TYPE STANDARD TABLE OF /tcsign/mdsc_mm_storage,
+      gs_storage  TYPE /tcsign/mdsc_mm_storage,
+**Start of Change by 2037782 on 20-Mar-24 for IP-92524
+      gt_weight   TYPE STANDARD TABLE OF /tcsign/mdsc_mm_weight,
+      gs_weight   TYPE /tcsign/mdsc_mm_weight,
+      gv_weight   TYPE /tcsign/mdsc_count,
+**End of Change by 2037782 on 20-Mar-24 for IP-92524
+*          gt_std_prc  TYPE STANDARD TABLE OF /tcsign/mdsc_mm_std_prc,
+*          gs_std_prc  TYPE /tcsign/mdsc_mm_std_prc,
+      gv_material TYPE /tcsign/mdsc_count,
+      gv_mm_sel   TYPE /tcsign/mdsc_count,
+      gt_rma      TYPE TABLE OF /tcsign/final_out,          "2152279
+      gs_rma      TYPE /tcsign/final_out.                   "2152279
+
+** Global Variable declarations
+DATA: gv_source  TYPE /tcsign/mdsc_count,
+      gv_price   TYPE /tcsign/mdsc_count,
+      gv_batch   TYPE /tcsign/mdsc_count,
+      gv_storage TYPE /tcsign/mdsc_count,
+*      gv_std_prc TYPE /tcsign/mdsc_count,
+      gv_temp1   TYPE /tcsign/mdsc_count,
+      gv_temp2   TYPE /tcsign/mdsc_count,
+      gv_rma_cnt TYPE /tcsign/mdsc_count.
+
+*Final output error check table and workarea
+DATA : ls_hold TYPE tbco_idoc_fx,
+       lt_hold TYPE TABLE OF tbco_idoc_fx. " Any input error error
+
+SELECTION-SCREEN BEGIN OF BLOCK b1.
+  SELECT-OPTIONS: s_matnr FOR mara-matnr,
+                  s_werks FOR marc-werks NO INTERVALS NO-EXTENSION OBLIGATORY,
+                  s_ersda FOR mara-ersda,
+                  s_ernam FOR mara-ernam,
+                  s_mtart FOR mara-mtart,       "++2037782  "20-Dec-2023 for IP-92155
+                  s_rueck FOR eina-rueck,       "Return Agmt                    "2152279 for MDSC New
+                  s_vmsta FOR mvke-vmsta.       "Article Status                 "2152279 for MDSC New
+*
+  PARAMETERS: p_param1 AS CHECKBOX,       "Source list
+              p_param2 AS CHECKBOX,       "Material Price
+              p_param3 AS CHECKBOX,       "Batch management
+              p_param4 AS CHECKBOX,       "Storage location
+*            p_param5 AS CHECKBOX,        "Material Std Price
+              p_param5 AS CHECKBOX,       "Gross weight and Net weight                "++2037782 for IP-92524
+              p_param6 AS CHECKBOX,       "Return Material Agreement
+              p_count  TYPE i,            "Counter - Data in chunks
+              p_chunk  TYPE i.            "Chunk Size
+SELECTION-SCREEN END OF BLOCK b1.
+
+CLEAR: gt_source,
+         gs_source,
+         gt_marc,
+         gt_marc2,
+         gs_marc,
+         gt_eord,
+         gs_eord,
+         gt_makt,
+         gs_makt,
+         gt_price,
+         gs_price,
+         gt_batch,
+         gs_batch,
+         gt_storage,
+         gs_storage,
+         gt_weight,
+         gv_weight,
+         gs_weight,
+*         gt_std_prc,
+*         gs_std_prc,
+         gv_material,
+         gv_mm_sel,
+         gv_source,
+         gv_price,
+         gv_batch,
+         gv_storage,
+*         gv_std_prc,
+         gv_temp1,
+         gv_temp2.
+
+START-OF-SELECTION.
+
+DATA: lv_dbcur TYPE cursor.
+
+  CLEAR: gt_marc,
+         gs_marc.
+
+** Start of Change by 2037782 on 20-Dec-23 for IP-92155
+* Validate Material type
+  SELECT mtart
+    FROM t134
+    INTO TABLE @DATA(lt_mtart)
+    WHERE mtart IN @s_mtart.
+  IF sy-subrc <> 0.
+    ls_hold-status = 'E'.
+    ls_hold-descrp = 'Incorrect Material Type is configured'.
+    APPEND ls_hold TO lt_hold.
+    EXPORT lt_hold TO MEMORY ID 'MM_HOLD'.
+    LEAVE PROGRAM.
+  ENDIF.
+** End of Change by 2037782 on 20-Dec-23 for IP-92155
+
+* Get the Total material count from MARC table
+  SELECT COUNT(*)
+    FROM marc
+    INTO gv_material
+    WHERE werks IN s_werks.
+  IF sy-subrc = 0.
+* Export total material count
+    EXPORT gv_material TO MEMORY ID 'MM_CNT'.
+  ELSE.
+    ls_hold-status = 'E'.
+    ls_hold-descrp = 'No Data Found for the Selection Criteria'.
+    APPEND ls_hold TO lt_hold.
+    EXPORT lt_hold TO MEMORY ID 'MM_HOLD'.
+    RETURN.
+  ENDIF.
+
+* Get Material count for Selection-screen parameters
+  SELECT COUNT(*)
+  FROM marc AS a INNER JOIN mara AS b
+  ON a~matnr EQ b~matnr
+  INTO gv_mm_sel
+  WHERE a~matnr IN s_matnr
+    AND a~werks IN s_werks
+    AND a~lvorm = ' '
+    AND b~ersda IN s_ersda
+    AND b~ernam IN s_ernam
+*    AND b~mtart = 'ROH'.                                    "--2037782 on 20-Dec-23 for IP-92155
+    AND b~mtart IN s_mtart.                                  "++2037782 on 20-Dec-23 for IP-92155
+  IF sy-subrc = 0.
+* Export Material count for Selection-screen parameters
+    EXPORT gv_mm_sel TO MEMORY ID 'MM_SEL'.
+** Start of Change by 2037782 on 20-Dec-23 for IP-92155
+  ELSE.
+    ls_hold-status = 'E'.
+    ls_hold-descrp = 'No Data Found for the Selection Criteria'.
+    APPEND ls_hold TO lt_hold.
+    EXPORT lt_hold TO MEMORY ID 'MM_HOLD'.
+    RETURN.
+  ENDIF.
+** End of Change by 2037782 on 20-Dec-23 for IP-92155
+
+* Get the material data from MARA and MARC table
+  OPEN CURSOR lv_dbcur FOR
+
+    SELECT a~matnr
+           a~werks
+           a~kzkri
+           a~xchpf
+           a~kordb
+           b~ersda                                       "++2037782 on 14-Oct-24 for IP-112275
+**Start of Change by 2037782 on 20-Mar-24 for IP-92524
+           b~mtart
+           b~brgew
+           b~ntgew
+           b~gewei
+**End of Change by 2037782 on 20-Mar-24 for IP-92524
+      FROM marc AS a INNER JOIN mara AS b
+      ON a~matnr EQ b~matnr
+*    INTO TABLE gt_marc
+      WHERE a~matnr IN s_matnr
+        AND a~werks IN s_werks
+        AND a~lvorm = ' '
+        AND b~ersda IN s_ersda
+        AND b~ernam IN s_ernam
+*        AND b~mtart = 'ROH'                                 "--2037782 on 20-Dec-23 for IP-92155
+        AND b~mtart IN s_mtart                               "++2037782 on 20-Dec-23 for IP-92155
+        ORDER BY b~matnr.
+  DO p_count TIMES .
+    FETCH NEXT CURSOR lv_dbcur
+    INTO TABLE gt_marc PACKAGE SIZE  p_chunk.
+
+    IF sy-subrc <> 0.
+      CLEAR: gt_marc.
+      ls_hold-status = 'E'.
+      ls_hold-descrp = 'Increment ID is large to have records'.
+      APPEND ls_hold TO lt_hold.
+    ENDIF.
+  ENDDO.
+
+  CLOSE CURSOR: lv_dbcur.
+
+  IF gt_marc IS NOT INITIAL.
+
+    SORT gt_marc BY matnr werks.
+
+    SELECT * FROM makt INTO TABLE gt_makt
+             FOR ALL ENTRIES IN gt_marc
+             WHERE matnr = gt_marc-matnr
+             AND spras = sy-langu.
+    IF sy-subrc = 0.
+      SORT gt_makt BY matnr.
+    ENDIF.
+  ELSE.
+    ls_hold-status = 'E'.
+    ls_hold-descrp = 'No Data Found for the Selection Criteria'.
+    APPEND ls_hold TO lt_hold.
+    EXPORT lt_hold TO MEMORY ID 'MM_HOLD'.
+    RETURN.
+  ENDIF.
+
+CLEAR: gt_marc2, gt_eord, gs_source, gv_temp1, gv_temp2.
+
+  gt_marc2 = gt_marc.
+
+  DELETE gt_marc2 WHERE kordb <> 'X'.
+
+* Count of total Source list records
+  DESCRIBE TABLE gt_marc2 LINES gv_temp1.
+
+  IF gt_marc2 IS NOT INITIAL.
+    SELECT matnr werks zeord
+      FROM eord
+      INTO TABLE gt_eord
+      FOR ALL ENTRIES IN gt_marc2
+      WHERE matnr = gt_marc2-matnr
+        AND werks = gt_marc2-werks.
+    IF sy-subrc = 0.
+      SORT gt_eord BY matnr werks.
+    ENDIF.
+  ENDIF.
+
+* Create final internal table for Source list Record (Inconsistent)
+  LOOP AT gt_marc2 INTO gs_marc.
+    gs_source-matnr     = gs_marc-matnr.
+    SHIFT gs_source-matnr LEFT DELETING LEADING '0'.
+    gs_source-werks     = gs_marc-werks.
+    gs_source-kordb     = gs_marc-kordb.
+    gs_source-mtart     = gs_marc-mtart.                  "++2037782 on IP-92524
+    gs_source-ersda     = gs_marc-ersda.                  "++2037782 on 14-Oct-24 for IP-112275
+    CLEAR: gs_makt.
+    READ TABLE gt_makt INTO gs_makt WITH KEY matnr = gs_marc-matnr BINARY SEARCH.
+    IF sy-subrc = 0.
+      gs_source-maktx = gs_makt-maktx.
+    ENDIF.
+
+    gs_source-kzkri     = gs_marc-kzkri.
+
+    CLEAR gs_eord.
+    READ TABLE gt_eord INTO gs_eord WITH KEY matnr = gs_marc-matnr
+                                             werks = gs_marc-werks BINARY SEARCH.
+    IF sy-subrc <> 0.
+      gs_source-source  = 'No'.
+      APPEND gs_source TO gt_source.
+    ENDIF.
+    CLEAR: gs_source, gs_marc.
+  ENDLOOP.
+
+
+  IF gt_source[] IS NOT INITIAL.
+* Count of in-consistent records
+    DESCRIBE TABLE gt_source LINES gv_temp2.
+
+*  Export Source list data to RFC
+    SORT gt_source BY matnr.
+    EXPORT gt_source TO MEMORY ID 'MM_SOURCE'.
+  ENDIF.
+
+* count of consistent records.
+  gv_source = gv_temp1 - gv_temp2.
+
+* Export source list consistent record count
+  EXPORT gv_source TO MEMORY ID 'MM_SOURCE_CNT'.
+
+  CLEAR: gt_marc2.
+
