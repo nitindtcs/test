@@ -11,14 +11,32 @@
 - Open "role permission manager"
 	Doctype: City, Role: System manager ... check Import
 
-Reload
-Customize form: Project
+- Reload
 
-Make "series" readonly
-	Label				Type	Options
-	Project Year		Select	25/26/27
-	City				Link	City
-	Project Category	Select	Residential/Commercial
+- Customize form: Project
+	Change "Naming" from "Details"
+		Change "naming rule" to "by fieldname"
+		In autoname, type "field:project_name"
+		Update
+	Create new section and move
+		From fields, edit "Customer details", click on "Insert above"
+			Label "Other details"
+			TYpe "Section break"
+			CLick "Collapseble"
+			Move these fields under this section
+				%Completion method
+				%Complete
+				Priority
+				From template
+				Expected start date
+				Expected end date
+				-- Add proper column break
+			Update
+	Add below 3 fields:
+		Label				Type	Options
+		Project Year		Select	25/26/27
+		City				Link	City
+		Project Category	Select	Residential/Commercial
 Reload
 
 Settings → Server Scripts → New
@@ -102,4 +120,5 @@ function update_preview(frm) {
         );
     }
 }
+
 
