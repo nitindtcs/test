@@ -1,9 +1,16 @@
-Create new module - MetaMorpher
-Create new doctype - City
-	Field: City Name
-	Type: Data
-	Autoname: field:city_name
-	Form settings: Allow import
+- Create new doctype - City
+	Create new module - MetaMorpher
+	"is custom" - Checked
+	Continue
+	In Settings, go to bottom and add field:
+		Field: City Name
+		Type: Data
+		Autoname: field:city_name
+	Save
+
+- Open "role permission manager"
+	Doctype: City, Role: System manager ... check Import
+
 Reload
 Customize form: Project
 
@@ -95,3 +102,4 @@ function update_preview(frm) {
         );
     }
 }
+
