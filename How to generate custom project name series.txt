@@ -6,7 +6,7 @@
 		Field: City Name
 		Type: Data
 		Autoname: field:city_name
-	Save
+	Update
 
 - Open "role permission manager"
 	Doctype: City, Role: System manager ... check Import
@@ -24,6 +24,7 @@
 			TYpe "Section break"
 			CLick "Collapseble"
 			Move these fields under this section
+				Series
 				%Completion method
 				%Complete
 				Priority
@@ -32,17 +33,18 @@
 				Expected end date
 				-- Add proper column break
 			Update
-	Add below 3 fields:
+	Move Customer/Client in main section
+	Add below 3 fields below "Customer/Client":
 		Label				Type	Options
-		Project Year		Select	25/26/27
-		City				Link	City
-		Project Category	Select	Residential/Commercial
+		Project Year		Select	25/26/27	Mandatory
+		City				Link	City		Mandatory
+		Project Category	Select	Residential/Commercial		Mandatory
 Reload
 
 Settings → Server Scripts → New
 	Name: create project id
 	Type: DocType Event
-	DocType: Project
+	Reference document type: Project
 	Event: Before Insert
 
 
@@ -88,6 +90,7 @@ doc.name = project_name   # THIS IS THE FIX
 Client Script (Live Preview)
 📍 Settings → Client Scripts → New
 Client Script Settings
+Name: create project id
 DocType: Project
 apply to: form
 Enabled: yes
@@ -120,5 +123,6 @@ function update_preview(frm) {
         );
     }
 }
+
 
 
