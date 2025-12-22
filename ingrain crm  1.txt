@@ -1,0 +1,88 @@
+BD = business developer
+
+headcount = Business Developer 6, telecaller 5
+role/designation = BD (Salary + incentive), telecallers (reports to BD) = no team, all individual
+
+telecaller (Salary)
+	- calling
+	- setup meeting
+
+BD (commission)
+telecaller - cold call
+log the customer details
+register project
+proposal send (from associate)
+	HR has proposal/contract
+	Abhay/Kiran to identify associate
+followup
+meet in person, follow if needed
+advance collection, then create project to associate/project
+
+doctypes
+
+
+process
+customer = create, update, deactivate
+customer communication = follow up (email, call, in person meeting)
+customer communication = send proposal
+project = create (from series), update, deactivate
+proposal/contract = create, update, deactivate
+advance payment = receive payment, send receipt
+
+people
+Telecaller = cold calls to customers
+Business Developer = works with customer, creates proposal, sends proposal, follows up with customer
+Associate = creates proposal
+CEO = decides which associate will work on which customer, reviews proposal
+
+CRM Sections and links:
+
+Selling Pipeline
+================
+Leads
+Defines an unqualified incoming sales contact; use the link above to capture and review leads.
+/app/lead
+
+Prospects
+Defines a qualified potential customer; use the link above to identify and track prospects.
+/app/prospect
+
+Opportunities
+Defines an active sales deal; use the link above to follow and progress opportunities.
+/app/opportunity
+
+Quotations
+Defines a formal price proposal; use the link above to create and issue quotations.
+/app/quotation
+
+Clients
+Defines an existing customer; use the link above to view and maintain client records.
+/app/customer
+
+Selling Masters
+================
+Items
+Defines a sellable product or service; use the link above to set up and control items.
+/app/item
+
+Contracts
+Defines a legally binding agreement; use the link above to record and oversee contracts.
+/app/contract
+
+Sales Orders
+Defines a confirmed customer commitment; use the link above to process and track sales orders.
+/app/sales-order
+
+Sales Invoices
+Defines a request for payment; use the link above to generate and monitor invoices.
+/app/sales-invoice
+
+Selling Organization
+====================
+Sales Persons
+Defines an internal sales representative; use the link above to assign and administer sales persons.
+/app/sales-person
+
+Sales Partners
+Defines an external selling entity; use the link above to onboard and govern sales partners.
+/app/sales-partner
