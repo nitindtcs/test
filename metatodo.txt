@@ -22,20 +22,27 @@
     1. Single click - selec task
     2. Double click - open for view task (summary, description, date, ETA, priority, status, etc)
     3. Escape - to come to default view without saving
+    4. Right click - Edit - edit summary
+    5. Right click - Cut - cuts task and ready to be moved
+    6. Right click - Move here - moves task as subtask
+    7. Right click - Delete - deletes the current task, not subtask(s)
+    8. Control Z - Undo
   d2. Icons
     1. Pencil icon to edit summary of task there itself without opening details
     2. + icon to add subtask to a task
-    3. Delete icon to delete this task and its subtasks
-    4. Left trialgle/down trialngle - Clicking on left will show all suntasks. Clicking on down angle hides all subtasks.
+    3. Left trialgle/down trialngle - Clicking on left will show all suntasks. Clicking on down angle hides all subtasks.
   d3. Buttons
     1. Add task to add task to main list at bottom
   e. Settings -
-      Slider - ReadOnly / ReadWrite - When ReadOnly is active, changes are not allows. Sorting is 
-allowed.
+      Slider - ReadOnly/ReadWrite - When ReadOnly is active, changes are not allows. Sorting is 
+allowed. Background color changes to gray.
         ReadOnly - Background changes gray. Pencil icon is hidden.
-      Slider - Show subtasks / Hide subtasks - Shows all subtasks of all tasks, hides does opposite.
+      Slider - Show/hide subtasks - Shows all subtasks of all tasks, hides does opposite.
+      Slider - Show/hide deleted tasks
+      Slider - DarkMode/LightMode
   f. Global search bar to search through all projects, subprojects, tasks, subtasks and their description
   f. Profile
     Self register - email id and password
     Reset password via email
+  g. Memory - All actions can be remembered and undone.
 3. Technologies
