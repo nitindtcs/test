@@ -7,13 +7,35 @@
     Priority: High/Medium/Low
     Status: Not started/In progress/Completed/Deleted/On hold
     Serial number: The number at which the task is to be shown. 1 is at top.
+    End date: Date
   b. Subtask - Its a task but with a parent task. Can have any number of subtasks.
   c. Project - A list of tasks
     Task list: All tasks and sub tasks
-  b. View - Shows tree stcture of tasks and subtasks based on serial number
+    Subproject - A project can have subprojects
+  d. View - Shows tree stcture of tasks and subtasks based on serial number
       View shows Grid/table. This shows 3 columns
         1. Task summary
         2. Task priority
         3. Task Statusnew 'named' view that contains different settings
       Sorting of task - Manual, Alphabetical of summary
-      Slider - ReadOnly / ReadWrite - When ReadOnly is active, changes are not allows. Sorting is allowed.
+  d1. Actions allowed (app needs to work as desktop app)
+    1. Single click - selec task
+    2. Double click - open for view task (summary, description, date, ETA, priority, status, etc)
+    3. Escape - to come to default view without saving
+  d2. Icons
+    1. Pencil icon to edit summary of task there itself without opening details
+    2. + icon to add subtask to a task
+    3. Delete icon to delete this task and its subtasks
+    4. Left trialgle/down trialngle - Clicking on left will show all suntasks. Clicking on down angle hides all subtasks.
+  d3. Buttons
+    1. Add task to add task to main list at bottom
+  e. Settings -
+      Slider - ReadOnly / ReadWrite - When ReadOnly is active, changes are not allows. Sorting is 
+allowed.
+        ReadOnly - Background changes gray. Pencil icon is hidden.
+      Slider - Show subtasks / Hide subtasks - Shows all subtasks of all tasks, hides does opposite.
+  f. Global search bar to search through all projects, subprojects, tasks, subtasks and their description
+  f. Profile
+    Self register - email id and password
+    Reset password via email
+3. Technologies
