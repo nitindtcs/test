@@ -46,3 +46,7 @@ allowed. Background color changes to gray.
     Reset password via email
   g. Memory - All actions can be remembered and undone.
 3. Technologies
+  Use database as backend
+  Every action needs to be commited in DB, and rolled back on undo.
+4. Look and feel
+  Lets copy github look and feel.
