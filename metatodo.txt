@@ -1,0 +1,19 @@
+1. Its a web applicable to create and manage todo tasks
+2. Features
+  a. Task - Entity that holds some information. Can have any number of sub tasks. Data strcuture:
+    Summary: 255 characters
+    Description: 1MB characters
+    Attachment: 10MB max
+    Priority: High/Medium/Low
+    Status: Not started/In progress/Completed/Deleted/On hold
+    Serial number: The number at which the task is to be shown. 1 is at top.
+  b. Subtask - Its a task but with a parent task. Can have any number of subtasks.
+  c. Project - A list of tasks
+    Task list: All tasks and sub tasks
+  b. View - Shows tree stcture of tasks and subtasks based on serial number
+      View shows Grid/table. This shows 3 columns
+        1. Task summary
+        2. Task priority
+        3. Task Statusnew 'named' view that contains different settings
+      Sorting of task - Manual, Alphabetical of summary
+      Slider - ReadOnly / ReadWrite - When ReadOnly is active, changes are not allows. Sorting is allowed.
